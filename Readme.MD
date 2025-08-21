@@ -73,6 +73,7 @@ RPS:          35.32
 
 | Flag | Description                        |
 | ---- | ---------------------------------- |
+| `-h` | Help                               |
 | `-u` | Target URL to benchmark            |
 | `-n` | Total number of requests           |
 | `-w` | Number of concurrent workers       |
