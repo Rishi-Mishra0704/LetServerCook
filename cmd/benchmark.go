@@ -81,7 +81,7 @@ func RunBenchmarks(r models.Request) models.Benchmark {
 			mu:       &mu,
 			client:   client,
 		}
-		go WorkerFixed(wr, results)
+		go Worker(wr, results)
 	}
 
 	fmt.Println("Enqueuing tasks...")
@@ -137,7 +137,7 @@ func RunBenchmarks(r models.Request) models.Benchmark {
 	}
 }
 
-func WorkerFixed(wr WorkerReq, results chan<- RequestResult) {
+func Worker(wr WorkerReq, results chan<- RequestResult) {
 	defer wr.wg.Done()
 	count := 0
 
