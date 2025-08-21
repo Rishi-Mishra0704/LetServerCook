@@ -108,4 +108,4 @@ Feel free to submit issues or pull requests. Follow these guidelines:
 
 ## License
 
-[MIT LICENCE]("./LICENCE")
+[MIT LICENCE]("./LICENSE")
