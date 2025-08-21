@@ -1,7 +1,10 @@
 # LetServerCook
 
-LetServerCook (LSC) is a lightweight HTTP benchmarking tool written in Go. It allows you to test the performance and reliability of your HTTP endpoints by sending concurrent requests, measuring latency, success rate, and requests per second (RPS).
+LetServerCook is a high-performance HTTP benchmarking tool written in Go, designed to test REST APIs under load with configurable concurrency and request counts. It allows developers to measure server performance by tracking request success rates, average and maximum latency, and requests per second (RPS) in real time.
 
+The tool leverages Go’s goroutines and channels to efficiently manage worker pools, ensuring accurate simulation of concurrent requests. It includes robust timeout handling, thread-safe result aggregation, and flexible configuration of HTTP methods and request parameters.
+
+Unit tests using testify validate benchmark logic and timeout handling, ensuring reliability across different scenarios. LetServerCook is a practical project for anyone looking to showcase skills in Go concurrency, HTTP programming, performance testing, and clean, testable code.
 ---
 
 ## Features
