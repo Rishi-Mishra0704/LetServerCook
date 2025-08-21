@@ -1,6 +1,8 @@
 package cmd_test
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -10,8 +12,15 @@ import (
 )
 
 func TestRunBenchmarks_AllSuccess(t *testing.T) {
+	// Local server that always returns 200
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("ok"))
+	}))
+	defer ts.Close()
+
 	r := models.Request{
-		URL:       "http://example.com",
+		URL:       ts.URL,
 		Method:    "GET",
 		TotalReqs: 10,
 		Workers:   2,
@@ -27,17 +36,47 @@ func TestRunBenchmarks_AllSuccess(t *testing.T) {
 	assert.True(t, bench.RPS > 0)
 }
 
-func TestWorkerHandlesTimeout(t *testing.T) {
+func TestRunBenchmarks_AllFail(t *testing.T) {
+	// Local server that always returns 500
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+		w.Write([]byte("fail"))
+	}))
+	defer ts.Close()
+
 	r := models.Request{
-		URL:       "http://example.com",
+		URL:       ts.URL,
 		Method:    "GET",
-		TotalReqs: 5,
-		Workers:   1,
-		TTL:       50 * time.Millisecond,
+		TotalReqs: 10,
+		Workers:   2,
+		TTL:       1 * time.Second,
 	}
 
 	bench := cmd.RunBenchmarks(r)
 
+	assert.Equal(t, 0, bench.Success)
+	assert.Equal(t, r.TotalReqs, bench.Failures)
+}
+
+func TestWorkerHandlesTimeout(t *testing.T) {
+	// Server sleeps longer than TTL to trigger timeout
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(100 * time.Millisecond)
+		w.WriteHeader(200)
+	}))
+	defer ts.Close()
+
+	r := models.Request{
+		URL:       ts.URL,
+		Method:    "GET",
+		TotalReqs: 5,
+		Workers:   1,
+		TTL:       50 * time.Millisecond, // shorter than server sleep
+	}
+
+	bench := cmd.RunBenchmarks(r)
+
+	// All requests should fail due to timeout
 	assert.Equal(t, 0, bench.Success)
 	assert.Equal(t, r.TotalReqs, bench.Failures)
 }
